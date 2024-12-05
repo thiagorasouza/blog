@@ -10,23 +10,103 @@
       href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <!-- <template id="blog-post-template">
+      <h2>Post Title</h2>
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Mollitia
+        voluptate quia necessitatibus unde, quos dolorem neque molestiae aperiam
+        laudantium animi voluptatibus dolorum dignissimos iste iure, accusantium
+        saepe. Qui, possimus odio?
+      </p>
+    </template> -->
+
     <main>
       <header>
         <h1>Thiago's Blog</h1>
       </header>
       <section>
         <article>
-          <h2>Post Title Example</h2>
+          <h2>From thinking React to thinking Web Components</h2>
           <p>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quisquam
-            fugit nam est! Dolores velit non eum illo neque porro deleniti
-            repellat id enim nulla modi laboriosam in, placeat quam minus.
+            First things first. Why use Web Components instead of React? Well, I
+            <strong>don't</strong> have an answer for that, but if you are
+            reading this, you are, like me, at least interested in
+            <u>experimenting</u> with Web Components. Maybe because you are
+            <u>curious</u>.
+          </p>
+          <p>
+            I'm skipping basic explanations. You can read it at MDN: <br />
+            <a
+              href="https://developer.mozilla.org/en-US/docs/Web/API/Web_components"
+              >Web Components @ MDN</a
+            >
+          </p>
+
+          <h3>Declaring Components</h3>
+          <div class="code-duo">
+            <pre><code id="snippet-1" class="language-javascript"></code></pre>
+            <pre><code id="snippet-2" class="language-jsx"></code></pre>
+          </div>
+
+          <p>
+            We can make it look more like React by leveraging
+            <strong>templates</strong>, which allow us be declarative rather
+            than imperative.
+          </p>
+          <pre><code id="snippet-3" class="language-javascript"></code></pre>
+
+          <p>
+            Now we can and should make all that boilerplate reusable by creating
+            a <code>defineWebComponent</code> function:
+          </p>
+          <pre><code id="snippet-4" class="language-javascript"></code></pre>
+
+          <p>
+            That will make our code way shorter and a step closer to React's
+            developer experience.
+          </p>
+          <p>
+            You can get syntax highlighting and Emmet support for the HTML
+            string in VSCode by installing the
+            <strong>es6-string-html</strong> extension. The
+            <code>/*&nbsp;HTML&nbsp;*/</code> commentary activates syntax
+            highlight and code formatting with prettier.
+          </p>
+          <div class="code-duo">
+            <pre><code id="snippet-5" class="language-jsx"></code></pre>
+            <pre><code id="snippet-6" class="language-javascript"></code></pre>
+          </div>
+        </article>
+
+        <article>
+          <h2>
+            Breaking Down UI into Reusable Components: WebComponents, React,
+            Angular, Vue
+          </h2>
+          <p>
+            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolor vel
+            officiis quae eos quo aliquid nam alias obcaecati molestias cum
+            laudantium amet non optio, sit repellendus pariatur doloribus quod
+            corrupti.
           </p>
         </article>
+        <blog-post></blog-post>
+        <blog-post></blog-post>
       </section>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+      <script src="js/main.js"></script>
+      <script src="js/snippets.js"></script>
     </main>
   </body>
 </html>

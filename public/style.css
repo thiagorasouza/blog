@@ -17,7 +17,7 @@ body {
 }
 
 main {
-  max-width: 80rem;
+  max-width: 100rem;
   margin: 0 auto;
   padding: 24px;
 }
@@ -27,6 +27,44 @@ header {
   margin-bottom: 3rem;
 }
 
-article h2 {
+article {
+  margin-bottom: 4rem;
+}
+
+article > p,
+article > ul,
+article h3 {
   margin-bottom: 1.5rem;
+}
+
+article h2 {
+  line-height: 1.5;
+  margin-bottom: 3rem;
+}
+
+article ul {
+  margin-left: 2rem;
+}
+
+.code-duo {
+  max-width: 100%;
+  display: flex;
+  gap: 2rem;
+}
+
+pre {
+  margin-bottom: 3rem;
+}
+
+.code-duo pre {
+  flex-grow: 1;
+}
+
+.code-duo code {
+  height: 100%;
+}
+
+p > code {
+  padding: 0.25rem 0.5rem;
+  background-color: bisque;
 }
