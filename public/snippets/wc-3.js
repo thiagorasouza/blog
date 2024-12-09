@@ -1,18 +1,19 @@
-// Web Component
-function defineWebComponent(name, templateString) {
-  const templateParsed = new DOMParser()
-    .parseFromString(`<template>${templateString}</template>`, "text/html")
-    .querySelector("template").content;
+class WebComponent extends HTMLElement {
+  constructor() {
+    super();
 
-  customElements.define(
-    name,
-    class extends HTMLElement {
-      constructor() {
-        super();
+    const templateString = /* HTML */ `
+      <template>
+        <style>${this.styles()}</style>
+        ${this.html()}
+      </template>
+    `;
 
-        const shadow = this.attachShadow({ mode: "open" });
-        shadow.appendChild(templateParsed.cloneNode(true));
-      }
-    },
-  );
+    const template = new DOMParser()
+      .parseFromString(templateString, "text/html")
+      .querySelector("template").content;
+    
+    const shadow = this.attachShadow({ mode: "open" });
+    shadow.appendChild(template.cloneNode(true));
+  }
 }

@@ -17,12 +17,32 @@ const snippets = [
   },
   {
     id: "snippet-5",
-    path: "rc-1.jsx",
+    path: "wc-4.js",
   },
   {
     id: "snippet-6",
-    path: "wc-4.js",
+    path: "rc-3.jsx",
   },
+  {
+    id: "snippet-7",
+    path: "wc-5.js",
+  },
+  // {
+  //   id: "snippet-8",
+  //   path: "wc-5.js",
+  // },
+  // {
+  //   id: "snippet-9",
+  //   path: "wc-6.js",
+  // },
+  // {
+  //   id: "snippet-10",
+  //   path: "wc-7.js",
+  // },
+  // {
+  //   id: "snippet-11",
+  //   path: "rc-3.jsx",
+  // },
 ];
 
 for (const snippet of snippets) {

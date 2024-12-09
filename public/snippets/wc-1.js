@@ -1,17 +1,20 @@
 // Web Component
-customElements.define(
-  "blog-post",
-  class extends HTMLElement {
-    constructor() {
-      super();
+class BlogPost extends HTMLElement {
+  constructor() {
+    super();
 
-      // Creates a div - imperative mode
-      const div = document.createElement("div");
-      div.textContent = "I'm a blog post";
+    const htmlString = /* HTML */ `
+      <div>"I'm a blog post"</div>
+    `;
+    
+    // Creates a shadow dom and attaches elements
+    const shadow = this.attachShadow({ mode: "open" });
+    shadow.innerHTML = htmlString;
+  }
+}
 
-      // Creates a shadow dom and attaches the div
-      const shadow = this.attachShadow({ mode: "open" });
-      shadow.appendChild(div);
-    }
-  },
-);
+customElements.define("blog-post", BlogPost);
+
+// Usage
+<blog-post></blog-post>
+

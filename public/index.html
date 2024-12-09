@@ -21,16 +21,6 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- <template id="blog-post-template">
-      <h2>Post Title</h2>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Mollitia
-        voluptate quia necessitatibus unde, quos dolorem neque molestiae aperiam
-        laudantium animi voluptatibus dolorum dignissimos iste iure, accusantium
-        saepe. Qui, possimus odio?
-      </p>
-    </template> -->
-
     <main>
       <header>
         <h1>Thiago's Blog</h1>
@@ -60,33 +50,63 @@
           </div>
 
           <p>
-            We can make it look more like React by leveraging
-            <strong>templates</strong>, which allow us be declarative rather
-            than imperative.
+            That's a lot of boilerplate and not yet very useful. We'll gradually
+            solve those problems in the sections below.
           </p>
-          <pre><code id="snippet-3" class="language-javascript"></code></pre>
+
+          <h3>Styling</h3>
+          <p>
+            One of the ways to create local styles (like CSS modules) is to
+            leverage a <code>template</code>. A <code>style</code> located
+            inside a <code>template</code> will only affect elements inside it.
+          </p>
+          <pre><code id="snippet-3"></code></pre>
 
           <p>
             Now we can and should make all that boilerplate reusable by creating
-            a <code>defineWebComponent</code> function:
+            a <code>WebComponent</code> parent class:
           </p>
           <pre><code id="snippet-4" class="language-javascript"></code></pre>
-
           <p>
-            That will make our code way shorter and a step closer to React's
-            developer experience.
+            Further components can be created by extending the
+            <code>WebComponent</code> class and declaring the
+            <code>styles()</code> and <code>html()</code> methods.
           </p>
+
+          <pre><code id="snippet-5" class="language-javascript"></code></pre>
           <p>
-            You can get syntax highlighting and Emmet support for the HTML
-            string in VSCode by installing the
-            <strong>es6-string-html</strong> extension. The
-            <code>/*&nbsp;HTML&nbsp;*/</code> commentary activates syntax
-            highlight and code formatting with prettier.
+            Not as neat as JSX, but you can get syntax highlighting, Emmet
+            support (HTML) and code completion (CSS) in the strings by
+            installing the VSCode extension
+            <strong>Inline HTML</strong>. These are enabled by the
+            <code>/*&nbsp;HTML&nbsp;*/</code> and the
+            <code>/* CSS */</code> commentaries. Formatting with
+            <strong>prettier</strong> also works.
+          </p>
+
+          <h3>Passing Props</h3>
+          <p>
+            To pass a props using Web Components you only need a
+            <code>slot</code> element properly placed and named.
           </p>
           <div class="code-duo">
-            <pre><code id="snippet-5" class="language-jsx"></code></pre>
-            <pre><code id="snippet-6" class="language-javascript"></code></pre>
+            <pre><code id="snippet-6" class="language-jsx"></code></pre>
+            <pre><code id="snippet-7" class="language-javascript"></code></pre>
           </div>
+          <p>
+            Note that we didn't have to modify the
+            <code>WebComponent</code> class, as the native features and
+            interface suffice.
+          </p>
+
+          <h3>Keeping Local State</h3>
+          <p>
+            The component itself is a <code>class</code>. By design, instances
+            does not share state (data) with one another, unless you declare
+            <code>static</code> properties. So we just need to make sure we are
+            able to provide initial values and a way to update the state that
+            should <strong>re-render</strong> the DOM.
+          </p>
         </article>
 
         <article>
@@ -101,8 +121,26 @@
             corrupti.
           </p>
         </article>
-        <blog-post></blog-post>
-        <blog-post></blog-post>
+
+        <blog-post>
+          <h2 slot="post-title">#1 Blog Post</h2>
+          <p slot="post-body">
+            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Deleniti
+            assumenda architecto aliquid voluptas eum quam earum quae dolore
+            recusandae repudiandae cupiditate explicabo exercitationem, quod aut
+            vel consectetur quisquam laboriosam possimus?
+          </p>
+        </blog-post>
+
+        <blog-post>
+          <h2 slot="post-title">#2 Blog Post</h2>
+          <p slot="post-body">
+            Ipsum dolor sit amet consectetur, adipisicing elit. Deleniti
+            assumenda architecto aliquid voluptas eum quam earum quae dolore
+            recusandae repudiandae cupiditate explicabo exercitationem, quod aut
+            vel consectetur quisquam laboriosam possimus?
+          </p>
+        </blog-post>
       </section>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
       <script src="js/main.js"></script>

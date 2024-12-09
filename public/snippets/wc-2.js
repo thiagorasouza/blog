@@ -1,24 +1,24 @@
-// Web Component
-const templateString = /* HTML */ `
-  <template>
-    <div>"I'm a blog post"</div>
-  </template>
-`;
+class BlogPost extends HTMLElement {
+  constructor() {
+    super();
 
-const templateParsed = new DOMParser()
-  .parseFromString(templateString, "text/html")
-  .querySelector("template").content;
+    // Bundle styles and html
+    const templateString = /* HTML */ `
+      <template>
+        <style> div { font-weight: 700; } </style>
+        <div>"I'm a blog post"</div>
+      </template>
+    `;
 
-customElements.define(
-  "blog-post",
-  class extends HTMLElement {
-    constructor() {
-      super();
+    // Parses the template
+    const template = new DOMParser()
+      .parseFromString(templateString, "text/html")
+      .querySelector("template").content;
+    
+    // Attaches a copy of the parsed template
+    const shadow = this.attachShadow({ mode: "open" });
+    this.shadow.appendChild(template.cloneNode(true));
+  }
+}
 
-      const shadow = this.attachShadow({ mode: "open" });
-      const templateClone = templateParsed.cloneNode(true);
-
-      shadow.appendChild(templateClone);
-    }
-  },
-);
+customElements.define("blog-post", BlogPost);
