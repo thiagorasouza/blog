@@ -27,6 +27,22 @@ const snippets = [
     id: "snippet-7",
     path: "wc-5.js",
   },
+  {
+    id: "snippet-8",
+    path: "wc-6.js",
+  },
+  {
+    id: "snippet-9",
+    path: "wc-7.js",
+  },
+  {
+    id: "snippet-10",
+    path: "wc-8.js",
+  },
+  {
+    id: "snippet-11",
+    path: "wc-9.js",
+  },
   // {
   //   id: "snippet-8",
   //   path: "wc-5.js",

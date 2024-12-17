@@ -22,6 +22,11 @@ main {
   padding: 24px;
 }
 
+footer {
+  text-align: center;
+  padding-bottom: 24px;
+}
+
 header {
   margin-top: 1rem;
   margin-bottom: 3rem;
@@ -43,7 +48,7 @@ article h2 {
 }
 
 article ul {
-  margin-left: 2rem;
+  margin-left: 4rem;
 }
 
 .code-duo {

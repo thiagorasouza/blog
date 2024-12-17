@@ -18,7 +18,8 @@ class WebComponent extends HTMLElement {
     this.render();
   }
 
-  // Giving direct access to this._state could overwrite the proxy
+  // Giving direct access to this._state could overwrite the proxy,
+
   set state(obj) {
     for (const key in obj) {
       this._state[key] = obj[key];
