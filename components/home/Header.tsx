@@ -5,9 +5,9 @@ import Link from "next/link";
 
 export function Header() {
   return (
-    <header className="flex items-center gap-3 py-8 text-4xl font-semibold">
+    <header className="flex items-center gap-3 py-1 text-4xl font-semibold md:py-8">
       <h1 className={lexendSans.className}>Thiago&apos;s Blog</h1>
-      <nav className="ml-auto flex gap-9">
+      <nav className="ml-auto hidden gap-9 md:flex">
         <Link href="https://www.linkedin.com/in/thiagorasouza/">
           <LinkedIn />
         </Link>
