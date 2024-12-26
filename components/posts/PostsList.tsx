@@ -1,10 +1,10 @@
 "use server";
 
 import { Post } from "@/components/posts/Post";
-import { getPosts } from "@/lib/getPosts";
+import { getPostsFilenames } from "@/lib/getPostsFilenames";
 
 export async function PostsList() {
-  const filenames = await getPosts();
+  const filenames = await getPostsFilenames();
 
   const promises = filenames.map(async (filename) => {
     const { default: Body, metadata } = await import(`@/content/${filename}`);

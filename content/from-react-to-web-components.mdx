@@ -7,10 +7,350 @@ export const metadata = {
   tags: ["React", "Javascript", "WebComponents"],
 };
 
-This is some **bold** and _italics_ text.
+First things first. Why use Web Components instead of React? Well, I **don't** have an answer for that, but if you are reading this, you are, like me, at least interested in **experimenting** with Web Components. Maybe because you are curious.
 
-This is a list in markdownn:
+I'm skipping basic explanations. You can read it at MDN:  
+[Web Components @ MDN](https://developer.mozilla.org/en-US/docs/Web/API/Web_components)
 
-- One
-- Two
-- Three
+Here's our agenda. We're going to try to mimic the following functionality that comes bundled with React but using WebComponents:
+
+- Declare components
+- Styles components locally
+- Pass props
+- Keep and update local state
+
+### Declaring Components
+
+```
+// Web Component
+class BlogPost extends HTMLElement {
+  constructor() {
+    super();
+
+    const htmlString = /* HTML */ `
+      <div>"I'm a blog post"</div>
+    `;
+
+    // Creates a shadow dom and attaches elements
+    const shadow = this.attachShadow({ mode: "open" });
+    shadow.innerHTML = htmlString;
+  }
+}
+
+customElements.define("blog-post", BlogPost);
+
+// Usage
+<blog-post></blog-post>
+```
+
+```
+// React counterpart
+function BlogPost() {
+  return <div>I'm a blog post</div>;
+}
+
+export { BlogPost };
+
+// Usage
+<BlogPost></BlogPost>
+```
+
+That's a lot of boilerplate and not yet very useful. We'll gradually solve those problems in the sections below.
+
+### Styling
+
+One of the ways to create local styles (like CSS modules) is to leverage a `template`. A `style` located inside a `template` will only affect elements inside it.
+
+```
+class BlogPost extends HTMLElement {
+  constructor() {
+    super();
+
+    // Bundle styles and html
+    const templateString = /* HTML */ `
+      <template>
+        <style> div { font-weight: 700; } </style>
+        <div>"I'm a blog post"</div>
+      </template>
+    `;
+
+    // Parses the template
+    const template = new DOMParser()
+      .parseFromString(templateString, "text/html")
+      .querySelector("template").content;
+
+    // Attaches a copy of the parsed template
+    const shadow = this.attachShadow({ mode: "open" });
+    this.shadow.appendChild(template.cloneNode(true));
+  }
+}
+
+customElements.define("blog-post", BlogPost);
+```
+
+```
+// React counterpart
+function BlogPost() {
+  return (
+    <div style={{ fontWeight: 700 }}>
+      I'm a blog post
+    </div>
+  );
+}
+
+export { BlogPost };
+```
+
+Now we can and should make all that boilerplate reusable by creating a `WebComponent` parent class:
+
+```
+class WebComponent extends HTMLElement {
+  constructor() {
+    super();
+
+    const templateString = /* HTML */ `
+      <template>
+        <style>${this.styles()}</style>
+        ${this.html()}
+      </template>
+    `;
+
+    const template = new DOMParser()
+      .parseFromString(templateString, "text/html")
+      .querySelector("template").content;
+
+    const shadow = this.attachShadow({ mode: "open" });
+    shadow.appendChild(template.cloneNode(true));
+  }
+}
+```
+
+```
+class BlogPost extends WebComponent {
+  constructor() {
+    super();
+  }
+
+  styles() {
+    return /* CSS */ `div { font-weight: 700; }`;
+  }
+
+  html() {
+    return /* HTML */ `<div>"I'm a blog post"</div>`;
+  }
+}
+
+customElements.define("blog-post", BlogPost);
+```
+
+Further components can be created by extending the `WebComponent` class and declaring the `styles()` and `html()` methods.
+
+Not as neat as JSX, but you can get syntax highlighting, Emmet support (HTML) and code completion (CSS) in the strings by installing the VSCode extension **Inline HTML**. These are enabled by the `/* HTML */` and the `/* CSS */` commentaries. Formatting with **prettier** also works.
+
+### Passing Props
+
+To pass a props using Web Components you only need a `slot` element properly placed and named.
+
+```
+class BlogPost extends WebComponent {
+  //...
+  html() {
+    return /* HTML */ `
+      <div>
+        <slot name="post-text">Fallback text.</slot>
+      </div>
+    `;
+  }
+}
+
+customElements.define("blog-post", BlogPost);
+
+// Usage
+<blog-post>
+  <p slot="post-title">The post text</p>
+</blog-post>
+```
+
+Notice that we didn't have to modify the `WebComponent` class, as the native slot's feature suffice.
+
+### Keeping Local State
+
+The component itself is a `class` and class instances does not share instance properties with one another. So if we declare the state as an instance property (`this.state`) it will be local to the component by design.
+
+But we still have to:
+
+- Be able to provide initial state values
+- Be able to update the state
+- And updating the state should **re-render** the DOM
+
+For that, we need to modify our `WebComponent` base class. At first, we will move the rendering logic from the `constructor` to a `render` method. By doing that we have a simpler way to trigger a re-render.
+
+```
+class WebComponent extends HTMLElement {
+  constructor() {
+    super();
+
+    // Creates the Shadow DOM
+    this.shadow = this.attachShadow({ mode: "open" });
+
+    // Triggers the first render
+    this.render();
+  }
+
+  render() {
+    // Bundle styles and html
+    const templateString = /* HTML */ `
+      <template>
+        <style>${this.styles()}</style>
+        ${this.html()}
+      </template>
+    `;
+
+    // Parses the template
+    const template = new DOMParser()
+      .parseFromString(templateString, "text/html")
+      .querySelector("template").content;
+
+    // Clears the Shadow DOM
+    this.shadow.innerHTML = "";
+
+    // Attaches a copy of the template to the now empty Shadow DOM
+    this.shadow.appendChild(template.cloneNode(true));
+  }
+}
+```
+
+Now we need to hold the state and watch for changes. One of the ways to do that is by using a `Proxy` object, which can intercept changes.
+
+```
+class WebComponent extends HTMLElement {
+  constructor() {
+    super();
+
+    // Re-renders the DOM when state is set to a new value
+    this._state = new Proxy(this.init(), {
+      set: (target, property, value) => {
+        target[property] = value;
+        this.render();
+        return true;
+      },
+    });
+
+    // Creates the Shadow DOM
+    this.shadow = this.attachShadow({ mode: "open" });
+
+    // Triggers the first render
+    this.render();
+  }
+
+  set state(obj) {
+    for (const key in obj) {
+      this._state[key] = obj[key];
+    }
+  }
+
+  get state() {
+    return this._state;
+  }
+
+ // ...
+}
+```
+
+`this._state` is an instance property that holds an object. This object initial's value is provided by `this.init()`, that should be implemented by `BlogPost`. The proxy ensures that every change triggers `this.render()`.
+
+Also note that we use a setter - `set state()` - to perform updates. Assigning `this._state = { ... }` directly would overwrite the proxy.
+
+Common ways to trigger state changes in the UI include **button clicks** and **input changes**, via events. We can create a friendlier interface to `addEventListener` for events to be registered in the child class.
+
+```
+class WebComponent extends HTMLElement {
+  //..
+
+  render() {
+    //..
+
+    // Attaches a copy of the template to the now empty Shadow DOM
+    this.shadow.appendChild(template.cloneNode(true));
+
+    // Attaches listeners
+    this.listeners();
+  }
+
+  handle(id, event, handler) {
+    this.shadow.getElementById(id).addEventListener(event, handler);
+  }
+}
+```
+
+All event listeners should be registered using `this.handle()` inside the Child's `listeners()` method, like the example below.
+
+```
+// Web Component
+class BlogPost extends WebComponent {
+  constructor() {
+    super();
+  }
+
+  init() {
+    return {
+      likes: 0,
+    };
+  }
+
+  listeners() {
+    this.handle("btn-add-like", "click", () => {
+      this.state.likes = this.state.likes + 1;
+    });
+  }
+
+  styles() {
+    return /* CSS */ `
+      .post-title {
+        color: red;
+      }
+      .post-body {
+        color: blue;
+      }
+    `;
+  }
+
+  html() {
+    return /* HTML */ `
+      <article>
+        <div class="post-title">
+          <slot name="post-title">[[Post Title]]</slot>
+        </div>
+        <div class="post-body">
+          <slot name="post-body">[[Post Body]]</slot>
+          <p>Likes: ${this.state.likes}</p>
+          <button id="btn-add-like">Add +1 Like</button>
+        </div>
+      </article>
+    `;
+  }
+}
+
+customElements.define("blog-post", BlogPost);
+
+// Usage
+<blog-post>
+  <h2 slot="post-title">#1 Blog Post</h2>
+  <p slot="post-body">
+    Lorem ipsum dolor sit amet consectetur,
+    adipisicing elit.
+  </p>
+</blog-post>
+
+<blog-post>
+  <h2 slot="post-title">#2 Blog Post</h2>
+  <p slot="post-body">
+    Deleniti assumenda architecto aliquid
+    voluptas eum quam earum quae dolore.
+  </p>
+</blog-post>
+```
+
+That's it. Not the fastest, not the prettiest, but we were able to implement core React functionality using WebComponents. I hope that you can take something out of this experiment.
+
+The full `WebComponent` class code is available [here](#).

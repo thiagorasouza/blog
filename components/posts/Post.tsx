@@ -40,7 +40,9 @@ export function Post({
         </h2>
         <p className="min-w-max text-gray-400 md:ml-auto">{date}</p>
       </header>
-      <div className={cn("prose")}>{type === "full" ? body : summary}</div>
+      <div className={cn("prose max-w-none")}>
+        {type === "full" ? body : summary}
+      </div>
       <div>
         <ul
           className={cn(

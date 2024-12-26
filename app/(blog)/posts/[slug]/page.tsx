@@ -1,5 +1,5 @@
 import { Post } from "@/components/posts/Post";
-import { getPosts } from "@/lib/getPosts";
+import { getPostsFilenames } from "@/lib/getPostsFilenames";
 
 export default async function Page({
   params,
@@ -13,10 +13,10 @@ export default async function Page({
 }
 
 export async function generateStaticParams() {
-  const contentFilenames = await getPosts();
+  const postsFilenames = await getPostsFilenames();
 
-  const slugs = contentFilenames.map((file) => {
-    const slug = file.slice(0, file.lastIndexOf("."));
+  const slugs = postsFilenames.map((filename) => {
+    const slug = filename.slice(0, filename.lastIndexOf("."));
     return { slug };
   });
 
