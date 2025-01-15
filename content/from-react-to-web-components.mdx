@@ -1,22 +1,26 @@
 export const metadata = {
-  title: "From Thinking React to Web Components",
+  title: "Implementing Core React Functionality using Web Components",
   summary:
-    "Rewriting core React functionality using WebComponents, Templates, Slots and Proxy",
+    "Exploring how Web Components can replicate core React functionality, from state management to styling, in a reusable and simplified approach",
   slug: "from-react-to-web-components",
-  date: "Dec 20, 2024",
-  tags: ["React", "Javascript", "WebComponents"],
+  date: "Jan 15th, 2025",
+  tags: ["React", "Javascript", "Web Component"],
 };
 
-First things first. Why use Web Components instead of React? Well, I **don't** have an answer for that, maybe you shouldn't, but if you are reading this, you are, like me, at least interested in **experimenting** with Web Components.
+Let’s start with the obvious question:
 
-That being said, today we are going to try to mimic the following functionality using Web Components while trying to abstract its convetional boilerplate with a single class. In the end, we should be able to:
+Why use Web Components instead of React?
 
-- Style components locally
-- Pass props to the Web Component
-- Keep local state
-- Update local state
+To be honest, React might still be a better choice for your needs. However, if you’re here, you’re likely curious about experimenting with Web Components, just like I was.
 
-We will use a BlogPost component as an example. The user should be able to pass only the blog title and the post body as props to the Web Component, while the Web Component should be able to **render the adequate post structure** and **keep a likes counter inside a local state**.
+In this post, we’ll aim to replicate some core React-like functionality using Web Components. Our goal is to abstract the conventional Web Components boilerplate into a single, reusable class. By the end of this experiment, we’ll be able to:
+
+- Apply styles scoped to individual components
+- Pass data (props) to a component
+- Maintain local state within a Web Component
+- Dynamically update the state and re-render
+
+To demonstrate, we’ll build a blog post. Users will provide the blog title and post body as props, while the component itself will handle rendering the appropriate structure, styling it, and maintaining a "likes counter" in its local state.
 
 The final interface should look like this:
 
@@ -65,12 +69,12 @@ customElements.define("blog-post", BlogPost);
 </blog-post>
 ```
 
-I'm assuming you already know the WebComponents API syntax and am skipping basic explanations. In case you don't, you can read it at MDN:  
+This guide assumes you’re already familiar with the basics of the Web Components API. If you are new to it or need a refresher, you can explore the official documentation on MDN:
 [Web Components @ MDN](https://developer.mozilla.org/en-US/docs/Web/API/Web_components)
 
 ### Declaring Components
 
-Let's start with the common Web Components boilerplate necessary to create a Web Component and build away from that.
+Let’s begin by looking at the common boilerplate code needed to create a Web Component, and then expand from that.
 
 ```
 // Web Component
@@ -82,7 +86,7 @@ class BlogPost extends HTMLElement {
       <div>"I'm a blog post"</div>
     `;
 
-    // Creates a shadow dom and attaches elements
+    // Creates a Shadow DOM and attaches elements
     const shadow = this.attachShadow({ mode: "open" });
     shadow.innerHTML = htmlString;
   }
@@ -106,11 +110,11 @@ export { BlogPost };
 <BlogPost></BlogPost>
 ```
 
-That's a lot of boilerplate compared to React and yet not very useful. We'll gradually solve those problems in the sections below.
+As you can see, that's a fair amount of code for a simple component definition. While this approach is functional, writing it repeatedly is unlikely to be enjoyable for any modern developer. In the following sections, we’ll tackle this issue and simplify it.
 
 ### Styling
 
-One of the ways to create styles local to the Web Component (like CSS modules) is to leverage a `template`. A `style` located inside a `template` will only affect elements inside it.
+One way to create styles local to the Web Component (similar to CSS modules) is to use a `<template>` element. A `<style>` located inside a `<template>` will only apply the CSS rules to elements within it.
 
 ```
 class BlogPost extends HTMLElement {
@@ -153,7 +157,7 @@ function BlogPost() {
 export { BlogPost };
 ```
 
-Now we can and should make all that boilerplate reusable by creating a `WebComponent` parent class:
+We can now simplify this by creating a reusable `WebComponent` base class that can be extended through a simpler interface:
 
 ```
 class WebComponent extends HTMLElement {
@@ -195,13 +199,13 @@ class BlogPost extends WebComponent {
 customElements.define("blog-post", BlogPost);
 ```
 
-Further components can be created by extending the `WebComponent` class and declaring the `styles()` and `html()` methods.
+Further components can be created by extending the `WebComponent` class and defining the `styles()` and `html()` methods.
 
-Not as neat as JSX, but you can get syntax highlighting in the strings returned by `styles()` and `html()` by installing the VSCode extension **Inline HTML**. These are enabled by the `/* HTML */` and the `/* CSS */` commentaries. Formatting with **Prettier** also works.
+Althoug this is not as neat as JSX, you can still get syntax highlighting for the strings returned by `styles()` and `html()` by installing the VSCode extension [Inline HTML](https://marketplace.visualstudio.com/items?itemName=pushqrdx.inline-html). This is enabled by the `/* HTML */` and `/* CSS */` comments. Formatting with [Prettier](https://prettier.io/) also works.
 
 ### Passing Props
 
-To pass props using Web Components you only need a `slot` element properly placed and named.
+To pass props to a Web Component, all you need is a `<slot>` element with the correct name.
 
 ```
 class BlogPost extends WebComponent {
@@ -223,19 +227,19 @@ customElements.define("blog-post", BlogPost);
 </blog-post>
 ```
 
-That way, what you write inside the `p` that has the `slot="post-title"` property will be passed to the Web Component `slot` element named `post-title`. Notice that we didn't have to modify the `WebComponent` class, as slots provides us the ability to receive props natively.
+That way, the contents of the `<p>` element with the attribute `slot="post-title"` will be passed to the `<slot>` element named `post-title`. Notice that we didn't have to modify the `WebComponent` base class, as slots provides us the ability to receive props natively.
 
 ### Keeping Local State
 
-The component itself is a `class` and class instances does not share instance properties with one another. So if we declare the state as an instance property (`this.state`) it will be local to the component by design.
+In a Web Component, the component itself is a `class`, and each instance has its own state. This means that declaring an instance property (e.g., `this.state`) will create state local to that component by design.
 
-But we still have to:
+However, we still need to:
 
 - Be able to provide initial state values
 - Be able to update the state
-- And updating the state should **re-render** the DOM
+- Ensure that when the state changes, the **DOM re-renders**.
 
-For that, we need to modify our `WebComponent` base class. At first, we will move the rendering logic from the `constructor` to a `render` method. By doing that we have a simpler way to trigger a re-render.
+To achieve this, we need to modify our `WebComponent` base class. First, we’ll move the rendering logic from the `constructor` to a `render` method. This will allow us (further down) to easily trigger a re-render whenever the state is updated.
 
 ```
 class WebComponent extends HTMLElement {
@@ -272,7 +276,7 @@ class WebComponent extends HTMLElement {
 }
 ```
 
-Now we need to hold the state and watch for changes. One of the ways to do that is by using a `Proxy` object, which can intercept changes.
+Now, we need to store the state and monitor for changes. One way to do this is by using a `Proxy` object, which can intercept and react to changes in the state.
 
 ```
 class WebComponent extends HTMLElement {
@@ -282,8 +286,10 @@ class WebComponent extends HTMLElement {
     // Re-renders the DOM when state is set to a new value
     this._state = new Proxy(this.init(), {
       set: (target, property, value) => {
-        target[property] = value;
-        this.render();
+        if (!Object.is(target[property], value)) {
+          target[property] = value;
+          this.render();
+        }
         return true;
       },
     });
@@ -309,11 +315,11 @@ class WebComponent extends HTMLElement {
 }
 ```
 
-`this._state` is an instance property that holds an object. This object initial's value is provided by `this.init()`, that should be implemented by `BlogPost`. The proxy ensures that every change triggers `this.render()`.
+`this._state` is an instance property that holds an object. The initial value of this object is provided by `this.init()`, which should be implemented by the `BlogPost` component. The `Proxy` ensures that every change in state triggers a re-render with `this.render()`.
 
-Also note that we use a setter - `set state()` - to perform updates. Assigning `this._state = { ... }` directly would overwrite the proxy.
+Additionally, note that we use a setter — `set state()` — to handle updates. Directly assigning `this._state = { ... }` would overwrite the proxy and break the reactivity.
 
-Common ways to trigger state changes in the UI include **button clicks** and **input changes**, via events. We can create a friendlier interface to `addEventListener` for events to be registered in the child class.
+Common ways to trigger state changes in the UI include **button clicks** and **input changes** via events. To make event handling easier, we can create a friendlier interface to `addEventListener` for registering events in the child class.
 
 ```
 class WebComponent extends HTMLElement {
@@ -335,7 +341,7 @@ class WebComponent extends HTMLElement {
 }
 ```
 
-For listener to be registered at the right time, all event listeners should be registered using `this.handle()`, inside the Child's `listeners()` method, like the example below.
+To ensure listeners are registered at the correct time, all event listeners should be added using `this.handle()`, inside the child component's `listeners()` method. Here’s an example:
 
 ```
 // Web Component
@@ -403,9 +409,9 @@ customElements.define("blog-post", BlogPost);
 </blog-post>
 ```
 
-That's it. Not the fastest, not the prettiest, but we were able to implement core React functionality using WebComponents. I hope that you can take something out of this experiment.
+That's it! While this still needs optimization for production, we’ve successfully implemented core React functionality using Web Components.
 
-The full `WebComponent` class code is available [in the code pen below](https://codepen.io/thiagorasouza/pen/QwLxjoQ).
+You can find the full `WebComponent` class code in the [CodePen below](https://codepen.io/thiagorasouza/pen/QwLxjoQ).
 
 <iframe
   height="300"
