@@ -7,19 +7,70 @@ export const metadata = {
   tags: ["React", "Javascript", "WebComponents"],
 };
 
-First things first. Why use Web Components instead of React? Well, I **don't** have an answer for that, but if you are reading this, you are, like me, at least interested in **experimenting** with Web Components. Maybe because you are curious.
+First things first. Why use Web Components instead of React? Well, I **don't** have an answer for that, maybe you shouldn't, but if you are reading this, you are, like me, at least interested in **experimenting** with Web Components.
 
-I'm skipping basic explanations. You can read it at MDN:  
+That being said, today we are going to try to mimic the following functionality using Web Components while trying to abstract its convetional boilerplate with a single class. In the end, we should be able to:
+
+- Style components locally
+- Pass props to the Web Component
+- Keep local state
+- Update local state
+
+We will use a BlogPost component as an example. The user should be able to pass only the blog title and the post body as props to the Web Component, while the Web Component should be able to **render the adequate post structure** and **keep a likes counter inside a local state**.
+
+The final interface should look like this:
+
+```
+// Component Definition
+class BlogPost extends WebComponent {
+
+  // Initial state values
+  init() {
+    return {
+      "<state>" : "<value>"
+    };
+  }
+
+  // Component styles
+  styles() {
+    return /* CSS */ `
+      .<classname> {
+        /* .. */
+      }
+    `;
+  }
+
+  // State update logic
+  listeners() {
+    // ...
+  }
+
+  // Component structure
+  html() {
+    return /* HTML */ `
+      <!-- ... -->
+    `.
+  }
+}
+
+customElements.define("blog-post", BlogPost);
+
+// Usage
+<blog-post>
+  <h2 slot="post-title">#1 Blog Post</h2>
+  <p slot="post-body">
+    Lorem ipsum dolor sit amet consectetur,
+    adipisicing elit.
+  </p>
+</blog-post>
+```
+
+I'm assuming you already know the WebComponents API syntax and am skipping basic explanations. In case you don't, you can read it at MDN:  
 [Web Components @ MDN](https://developer.mozilla.org/en-US/docs/Web/API/Web_components)
 
-Here's our agenda. We're going to try to mimic the following functionality that comes bundled with React but using WebComponents:
-
-- Declare components
-- Styles components locally
-- Pass props
-- Keep and update local state
-
 ### Declaring Components
+
+Let's start with the common Web Components boilerplate necessary to create a Web Component and build away from that.
 
 ```
 // Web Component
@@ -55,11 +106,11 @@ export { BlogPost };
 <BlogPost></BlogPost>
 ```
 
-That's a lot of boilerplate and not yet very useful. We'll gradually solve those problems in the sections below.
+That's a lot of boilerplate compared to React and yet not very useful. We'll gradually solve those problems in the sections below.
 
 ### Styling
 
-One of the ways to create local styles (like CSS modules) is to leverage a `template`. A `style` located inside a `template` will only affect elements inside it.
+One of the ways to create styles local to the Web Component (like CSS modules) is to leverage a `template`. A `style` located inside a `template` will only affect elements inside it.
 
 ```
 class BlogPost extends HTMLElement {
@@ -86,6 +137,7 @@ class BlogPost extends HTMLElement {
 }
 
 customElements.define("blog-post", BlogPost);
+
 ```
 
 ```
@@ -145,11 +197,11 @@ customElements.define("blog-post", BlogPost);
 
 Further components can be created by extending the `WebComponent` class and declaring the `styles()` and `html()` methods.
 
-Not as neat as JSX, but you can get syntax highlighting, Emmet support (HTML) and code completion (CSS) in the strings by installing the VSCode extension **Inline HTML**. These are enabled by the `/* HTML */` and the `/* CSS */` commentaries. Formatting with **prettier** also works.
+Not as neat as JSX, but you can get syntax highlighting in the strings returned by `styles()` and `html()` by installing the VSCode extension **Inline HTML**. These are enabled by the `/* HTML */` and the `/* CSS */` commentaries. Formatting with **Prettier** also works.
 
 ### Passing Props
 
-To pass a props using Web Components you only need a `slot` element properly placed and named.
+To pass props using Web Components you only need a `slot` element properly placed and named.
 
 ```
 class BlogPost extends WebComponent {
@@ -157,7 +209,7 @@ class BlogPost extends WebComponent {
   html() {
     return /* HTML */ `
       <div>
-        <slot name="post-text">Fallback text.</slot>
+        <slot name="post-title">Fallback text.</slot>
       </div>
     `;
   }
@@ -171,7 +223,7 @@ customElements.define("blog-post", BlogPost);
 </blog-post>
 ```
 
-Notice that we didn't have to modify the `WebComponent` class, as the native slot's feature suffice.
+That way, what you write inside the `p` that has the `slot="post-title"` property will be passed to the Web Component `slot` element named `post-title`. Notice that we didn't have to modify the `WebComponent` class, as slots provides us the ability to receive props natively.
 
 ### Keeping Local State
 
@@ -283,7 +335,7 @@ class WebComponent extends HTMLElement {
 }
 ```
 
-All event listeners should be registered using `this.handle()` inside the Child's `listeners()` method, like the example below.
+For listener to be registered at the right time, all event listeners should be registered using `this.handle()`, inside the Child's `listeners()` method, like the example below.
 
 ```
 // Web Component
@@ -353,4 +405,23 @@ customElements.define("blog-post", BlogPost);
 
 That's it. Not the fastest, not the prettiest, but we were able to implement core React functionality using WebComponents. I hope that you can take something out of this experiment.
 
-The full `WebComponent` class code is available [here](#).
+The full `WebComponent` class code is available [in the code pen below](https://codepen.io/thiagorasouza/pen/QwLxjoQ).
+
+<iframe
+  height="300"
+  style={{ width: "100%" }}
+  scrolling="no"
+  title="WebComponent with Local State"
+  src="https://codepen.io/thiagorasouza/embed/QwLxjoQ?default-tab=html%2Cresult"
+  frameBorder="no"
+  loading="lazy"
+  allowtransparency="true"
+  allowFullScreen={true}
+>
+  See the Pen{" "}
+  <a href="https://codepen.io/thiagorasouza/pen/QwLxjoQ">
+    WebComponent with Local State
+  </a>{" "}
+  by Thiago Souza (<a href="https://codepen.io/thiagorasouza">@thiagorasouza</a>
+  ) on <a href="https://codepen.io">CodePen</a>.
+</iframe>

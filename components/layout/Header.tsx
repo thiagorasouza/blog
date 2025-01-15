@@ -10,10 +10,10 @@ export function Header() {
         <Link href="/">Thiago&apos;s Blog</Link>
       </h1>
       <nav className="ml-auto hidden gap-9 md:flex">
-        <Link href="https://www.linkedin.com/in/thiagorasouza/">
+        <Link href="https://www.linkedin.com/in/thiagorasouza/" target="_blank">
           <LinkedIn />
         </Link>
-        <Link href="https://github.com/thiagorasouza">
+        <Link href="https://github.com/thiagorasouza" target="_blank">
           <Github />
         </Link>
       </nav>
